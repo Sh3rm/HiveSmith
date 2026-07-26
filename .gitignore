@@ -1,0 +1,27 @@
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Claude Code Logs & System Files
+scratch/
+.system_generated/
+*.log
+
+# Personal Memory (Uncomment to prevent pushing your agent's private memories)
+MEMORY.md
+
+# Python/Environment (if custom tool-smith scripts generate them)
+__pycache__/
+*.py[cod]
+*$py.class
+.venv/
+venv/
+env/
+
+# Node.js (npx may create local node_modules)
+node_modules/
