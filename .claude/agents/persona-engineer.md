@@ -16,12 +16,13 @@ Your role is to write the system prompts for the new swarm.
    - **For `.claude/agents/*.md` (Workers):** You MUST NOT generate 20-line files. Each agent definition must be rich in operational detail, containing explicit sections for Responsibilities, Context, Hard Constraints, Error Handling, and Output Formats. Detail exactly what they can and cannot do.
 3. **File Formats (CRITICAL STRUCTURAL REQUIREMENT — Claude Code native schema):**
    - **`CLAUDE.md` is PLAIN MARKDOWN.** It MUST NOT contain any YAML frontmatter. Claude Code ignores frontmatter in CLAUDE.md; model configuration belongs in `.claude/settings.json`.
-   - **Every `.claude/agents/<name>.md` file MUST begin with a valid YAML frontmatter block** bounded by `---`, containing EXACTLY these keys:
-     - `name:` — the agent's kebab-case identifier (must match the filename).
+   - **Every `.claude/agents/<name>.md` file MUST begin with a valid YAML frontmatter block** bounded by `---`. Core keys (write these for every agent):
+     - `name:` — the agent's kebab-case identifier (match the filename — house convention).
      - `description:` — an action-oriented description of when the Orchestrator should invoke this agent. Claude Code uses this text for automatic delegation, so write it as "Use this agent to/when ...".
      - `tools:` — a comma-separated allowlist of the tools the agent genuinely needs (e.g., `Read, Grep, Glob` for analysts; add `Write`, `Edit`, `Bash` only for agents that must modify files or run commands; `WebSearch, WebFetch` for researchers). Least privilege is mandatory — this list is a real security boundary enforced by Claude Code, not a suggestion.
      - `model:` — a Claude Code model alias assigned according to the Model Routing Doctrine (`fable`, `opus`, `sonnet`, `haiku`, or `inherit`).
-   - Do NOT emit legacy/foreign fields such as `max_output_tokens`, `enable_write_tools`, `enable_mcp_tools`, `enable_subagent_tools`, or `planning-mode` — Claude Code does not recognize them and they will silently do nothing.
+   - **Advanced official keys — add them when (and only when) the role justifies it:** `isolation: worktree` for agents that write files concurrently with other writers; `effort:` (`low`–`max`) when a role's reasoning depth should differ from the session default; `maxTurns:` as runaway protection on loop-prone workers; `disallowedTools:`, `permissionMode:`, `skills:`, `mcpServers:`, `hooks:`, `memory:`, `color:` per the Agent-as-Code rule. Never emit `permissionMode: bypassPermissions` without explicit human approval recorded in the blueprint.
+   - Do NOT emit legacy/foreign fields such as `max_output_tokens`, `enable_write_tools`, `enable_mcp_tools`, `enable_subagent_tools`, or `planning-mode` — Claude Code does not recognize them and they will silently do nothing. Any key outside the documented Claude Code set is a schema violation.
    - **`.claude/settings.json`:** Generate it with the swarm's default model, e.g. `{"model": "opus"}`.
 4. **Write to Disk (CRITICAL PATHS & DIRECTORIES):** Write the generated files directly to the host machine using your `Write` tool. **You MUST ensure the target directories exist before writing (use `Bash` `mkdir -p`)!**
    - The Orchestrator prompt MUST be written to: `<project-root>/CLAUDE.md`.
@@ -42,7 +43,7 @@ Your role is to write the system prompts for the new swarm.
 Before generating any new agent definition or `CLAUDE.md` file for the target swarm, you MUST execute the following step:
 1. Use the `Read` tool to read HiveSmith's OWN existing agent definition `.claude/agents/safety-engineer.md` and the Orchestrator `CLAUDE.md`.
 2. Treat these files as your **Absolute Golden Standard (Few-Shot Benchmark)** for:
-   - YAML frontmatter structure (`name`, `description`, `tools`, `model` — nothing else)
+   - YAML frontmatter structure (core: `name`, `description`, `tools`, `model`; advanced official keys only where the role justifies them)
    - XML tag encapsulation (`<constraints>`, `<workflow>`)
    - Strict JSON-only output enforcement
 3. Mirror this exact syntactic depth when drafting the target crew's / swarm's prompts.
