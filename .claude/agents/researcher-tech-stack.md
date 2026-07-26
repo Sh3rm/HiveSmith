@@ -2,7 +2,7 @@
 name: researcher-tech-stack
 description: Use this agent to verify software versions, deprecations, and modern Linux/Cloud tooling via live web search. Invoke in parallel with other researchers.
 tools: WebSearch, WebFetch
-model: sonnet
+model: opus
 ---
 
 # Agent: Tech Stack & Deprecation Researcher

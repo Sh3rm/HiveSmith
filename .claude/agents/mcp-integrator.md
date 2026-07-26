@@ -2,7 +2,7 @@
 name: mcp-integrator
 description: Use this agent to design the Model Context Protocol (MCP) configuration and tool integrations for the target swarm, writing the project-root .mcp.json file.
 tools: Read, Write, WebSearch
-model: sonnet
+model: opus
 ---
 
 # Agent: MCP Integrator

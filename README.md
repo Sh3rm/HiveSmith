@@ -51,20 +51,20 @@ All 19 sub-agents live in `.claude/agents/`:
 | `tool-smith` | Builds custom scripts when standard MCP tools aren't enough | Fable |
 | `memory-manager` | Designs shared context and persistence layers | Fable |
 | `researcher-synthesizer` | Merges all research into a single baseline | Fable |
-| `context-optimizer` | Compresses payloads without losing architectural logic | Sonnet |
-| `mcp-integrator` | Generates the project-root `.mcp.json` for the target swarm | Sonnet |
-| `dag-validator` | Validates swarm topology — detects cycles, orphan agents, broken links | Sonnet |
-| `telemetry-architect` | Designs logging, tracing, and metrics standards | Sonnet |
-| `researcher-google-cloud` | Google Cloud, Gemini best practices | Sonnet |
-| `researcher-anthropic-openai` | Anthropic & OpenAI multi-agent patterns | Sonnet |
-| `researcher-tech-stack` | Version verification, deprecation checks | Sonnet |
-| `researcher-security` | OWASP, HITL, guardrail best practices | Sonnet |
-| `researcher-academic-independent` | arXiv, independent AI research blogs | Sonnet |
-| `researcher-vcs-github` | Mines GitHub/GitLab for existing agent configs | Sonnet |
-| `repo-analyzer-worker` | Fast concurrent scanning of cloned repos | Haiku |
-| `qa-validator` | Schema validation, dependency checks, pass/fail reporting | Haiku |
+| `context-optimizer` | Compresses payloads without losing architectural logic | Opus |
+| `mcp-integrator` | Generates the project-root `.mcp.json` for the target swarm | Opus |
+| `dag-validator` | Validates swarm topology — detects cycles, orphan agents, broken links | Opus |
+| `telemetry-architect` | Designs logging, tracing, and metrics standards | Opus |
+| `researcher-google-cloud` | Google Cloud, Gemini best practices | Opus |
+| `researcher-anthropic-openai` | Anthropic & OpenAI multi-agent patterns | Opus |
+| `researcher-tech-stack` | Version verification, deprecation checks | Opus |
+| `researcher-security` | OWASP, HITL, guardrail best practices | Opus |
+| `researcher-academic-independent` | arXiv, independent AI research blogs | Opus |
+| `researcher-vcs-github` | Mines GitHub/GitLab for existing agent configs | Opus |
+| `repo-analyzer-worker` | Fast concurrent scanning of cloned repos | Sonnet |
+| `qa-validator` | Schema validation, dependency checks, pass/fail reporting | Sonnet |
 
-> "Default Tier" is set in each agent's `model:` frontmatter and applied automatically by Claude Code. The orchestrator can steer overrides at runtime based on task complexity.
+> "Default Tier" is set in each agent's `model:` frontmatter and applied automatically by Claude Code. HiveSmith's own roster is deliberately generously tiered — it is a creator, and the quality of what it forges is worth the tokens. The `haiku` tier remains part of the routing doctrine for the swarms HiveSmith generates.
 
 ## 🚀 Quick Start
 

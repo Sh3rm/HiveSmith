@@ -2,7 +2,7 @@
 name: telemetry-architect
 description: Use this agent to design logging, tracing, and telemetry standards for the generated agent swarm. Invoke during the infrastructure phase.
 tools: Read, Write
-model: sonnet
+model: opus
 ---
 
 # Agent: Telemetry & Observability Architect

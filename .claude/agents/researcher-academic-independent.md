@@ -2,7 +2,7 @@
 name: researcher-academic-independent
 description: Use this agent for Ultra Deep Research across academic papers (MIT, arXiv) and independent AI researcher blogs for bleeding-edge Agentic AI findings. Invoke in parallel with other researchers.
 tools: WebSearch, WebFetch
-model: sonnet
+model: opus
 ---
 
 # Agent: Academic & Independent AI Researcher

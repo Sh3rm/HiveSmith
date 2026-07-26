@@ -2,7 +2,7 @@
 name: context-optimizer
 description: Use this agent to compress research data and conversational bloat in the inter-agent payload (Manifesto) without altering core prompts or architectural schemas. Invoke after research synthesis and before persona generation.
 tools: Read
-model: sonnet
+model: opus
 ---
 
 # Agent: Context Optimizer & Token Manager

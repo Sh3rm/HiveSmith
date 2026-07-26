@@ -2,7 +2,7 @@
 name: repo-analyzer-worker
 description: Use this agent for high-speed concurrent scanning and analysis of specific directories inside locally cloned repositories under /tmp/. Spawn multiple instances in parallel for large repos.
 tools: Read, Glob, Grep, Bash
-model: haiku
+model: sonnet
 ---
 
 # Agent: Local Repository Analyzer

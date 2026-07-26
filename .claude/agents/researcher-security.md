@@ -2,7 +2,7 @@
 name: researcher-security
 description: Use this agent to research safety, governance, and guardrail best practices for agentic systems (OWASP, HITL, prompt-injection defense). Invoke in parallel with other researchers.
 tools: WebSearch, WebFetch
-model: sonnet
+model: opus
 ---
 
 # Agent: Security & Safety Researcher

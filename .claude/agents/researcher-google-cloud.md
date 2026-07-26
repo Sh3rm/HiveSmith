@@ -2,7 +2,7 @@
 name: researcher-google-cloud
 description: Use this agent to research Google Cloud, Gemini, and Agentic Workflow best practices via live web search. Invoke when the target domain involves Google technologies.
 tools: WebSearch, WebFetch
-model: sonnet
+model: opus
 ---
 
 # Agent: Google Cloud & Gemini Researcher
