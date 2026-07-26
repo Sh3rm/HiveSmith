@@ -32,7 +32,7 @@ If QA or DAG validation finds issues, the pipeline loops back for refinement aut
 
 - **Native Claude Code Sub-Agents.** Every worker persona is a `.claude/agents/<name>.md` file with the official frontmatter schema (`name`, `description`, `tools`, `model`). The orchestrator delegates through Claude Code's Agent tool, so each worker runs in an isolated context window with a least-privilege tool allowlist enforced by the harness itself — researchers can search but not write, validators can read but not modify.
 
-- **Tier-Based Model Routing.** HiveSmith assigns models using Claude aliases (`fable`, `opus`, `sonnet`, `haiku`) based on cognitive load. Heavy reasoning and orchestration gets `fable` (Fable 5), complex coding gets `opus` (Opus 4.8), research gets `sonnet` (Sonnet 5), fast scanning gets `haiku` (Haiku 4.5). When Anthropic ships new models, the aliases resolve to the latest versions automatically.
+- **Tier-Based Model Routing.** HiveSmith assigns models using Claude aliases (`fable`, `opus`, `sonnet`, `haiku`) based on cognitive load. Heavy reasoning and orchestration gets `fable` (Fable 5), complex coding gets `opus` (Opus 5), research gets `sonnet` (Sonnet 5), fast scanning gets `haiku` (Haiku 4.5). When Anthropic ships new models, the aliases resolve to the latest versions automatically.
 
 - **Research Before Architecture.** Every generated swarm includes its own researcher agents. HiveSmith never relies on pre-trained knowledge for domain-specific decisions. It searches the web first, every time — via Claude Code's native `WebSearch`/`WebFetch` tools, with an optional tokenless [duckduckgo-mcp-server](https://pypi.org/project/duckduckgo-mcp-server/) fallback in `.mcp.json`.
 
@@ -90,7 +90,7 @@ claude "Build me a Kubernetes monitoring swarm with Prometheus and Grafana integ
 
 That's it. HiveSmith will research the domain, architect the agent hierarchy, write every prompt and config file, validate the output, and deliver a working swarm into your target directory.
 
-> **Model configuration is automatic.** The default model is set in `.claude/settings.json`, and each sub-agent's `model:` frontmatter uses Claude aliases (`fable`, `opus`, `sonnet`, `haiku`) that automatically resolve to the latest available versions (currently Fable 5, Opus 4.8, Sonnet 5, Haiku 4.5). You don't need to edit model names manually.
+> **Model configuration is automatic.** The default model is set in `.claude/settings.json`, and each sub-agent's `model:` frontmatter uses Claude aliases (`fable`, `opus`, `sonnet`, `haiku`) that automatically resolve to the latest available versions (currently Fable 5, Opus 5, Sonnet 5, Haiku 4.5). You don't need to edit model names manually.
 
 > **File access is native.** Claude Code's built-in `Read`/`Write`/`Edit`/`Bash` tools (governed by its permission system) handle all filesystem work — no filesystem MCP server is needed or used.
 
