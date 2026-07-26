@@ -12,8 +12,7 @@ To ensure perfect interoperability, the `domain-architect` MUST always output th
     {
       "id": "string",
       "role": "string",
-      "tier": "string (e.g., 'fable', 'opus', 'sonnet', 'haiku')",
-      "model": "string",
+      "model": "string ('fable', 'opus', 'sonnet', 'haiku', or 'inherit' — maps 1:1 to the agent frontmatter `model` key; never a full model version string)",
       "tools_required": ["string"],
       "dependencies": ["string"]
     }
