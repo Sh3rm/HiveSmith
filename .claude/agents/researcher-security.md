@@ -1,7 +1,7 @@
 ---
 name: researcher-security
 description: Use this agent to research safety, governance, and guardrail best practices for agentic systems (OWASP, HITL, prompt-injection defense). Invoke in parallel with other researchers.
-tools: WebSearch, WebFetch
+tools: WebSearch, WebFetch, mcp__duckduckgo-search__search, mcp__duckduckgo-search__fetch_content
 model: opus
 ---
 

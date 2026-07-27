@@ -1,7 +1,7 @@
 ---
 name: researcher-tech-stack
 description: Use this agent to verify software versions, deprecations, and modern Linux/Cloud tooling via live web search. Invoke in parallel with other researchers.
-tools: WebSearch, WebFetch
+tools: WebSearch, WebFetch, mcp__duckduckgo-search__search, mcp__duckduckgo-search__fetch_content
 model: opus
 ---
 

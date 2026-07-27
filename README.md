@@ -10,13 +10,14 @@ A meta-agent system that designs and generates production-ready multi-agent swar
 
 You describe what you need. HiveSmith researches the domain, architects the agent hierarchy, writes every prompt and config file, validates the topology, and delivers a working swarm — ready to run with `claude`.
 
-> **HiveSmith** — the smith that forges hives. Sister project of [SwarmForge](https://github.com/Sh3rm/SwarmForge) (the Gemini/Antigravity edition): same architecture, same 19 agents, same 7-step pipeline — rebuilt from the ground up on Claude Code's native primitives: sub-agents, auto-loaded rules, and project MCP config.
+> **HiveSmith** — the smith that forges hives. Sister project of [SwarmForge](https://github.com/Sh3rm/SwarmForge) (the Gemini/Antigravity edition): same architecture, same 19 agents, same pipeline — rebuilt from the ground up on Claude Code's native primitives: sub-agents, auto-loaded rules, and project MCP config.
 
 ## How It Works
 
-HiveSmith is itself a swarm. An orchestrator (`CLAUDE.md`) coordinates 19 specialized sub-agents — each a real Claude Code sub-agent with its own isolated context window, tool allowlist, and model tier — through a 7-step pipeline:
+HiveSmith is itself a swarm. An orchestrator (`CLAUDE.md`) coordinates 19 specialized sub-agents — each a real Claude Code sub-agent with its own isolated context window, tool allowlist, and model tier — through an interactive pre-flight step plus a 7-step pipeline:
 
 ```
+0. Pre-Flight Disambiguation — Challenge vague requests with clarifying questions (skipped when the request is explicit)
 1. Information Gathering    — Apply model routing, spawn domain researchers in parallel
 2. Synthesis                — Merge raw research into a unified architectural baseline
 3. Architecture             — Design the swarm blueprint with tier-based model routing
@@ -103,6 +104,7 @@ HiveSmith/
 ├── LICENSE
 ├── .gitignore
 ├── .mcp.json                          # Project-scoped MCP servers (optional search fallback)
+├── research-archive/                  # Frozen research corpus from past generation runs (not live config)
 └── .claude/
     ├── settings.json                  # Default model + project settings
     ├── rules/                         # Auto-loaded global rules

@@ -30,12 +30,14 @@ model: sonnet
   - `disallowedTools:` — deny-list subtracted from the inherited/specified tools.
   - `effort:` — reasoning depth (`low`, `medium`, `high`, `xhigh`, `max`); overrides the session effort for this agent.
   - `isolation: worktree` — runs the agent in a temporary git worktree; assign it to agents that write files in parallel with other writers.
-  - `permissionMode:` — `default`, `acceptEdits`, `dontAsk`, `bypassPermissions`, or `plan`; never generate `bypassPermissions` without explicit human approval.
+  - `permissionMode:` — `default`, `acceptEdits`, `auto`, `dontAsk`, `bypassPermissions`, or `plan` (`manual` is accepted as an alias of `default` on Claude Code ≥ 2.1.200); never generate `bypassPermissions` without explicit human approval.
   - `maxTurns:` — hard cap on agentic turns for runaway protection.
   - `skills:` — skill names preloaded (full content) into the agent's context at startup.
   - `mcpServers:` — per-agent MCP servers (named references or inline configs).
   - `hooks:` — lifecycle hooks scoped to this agent.
   - `memory:` — persistent memory scope (`user`, `project`, or `local`) for cross-session learning.
+  - `background: true` — always run this agent as a background task, even when the caller needs its result immediately.
+  - `initialPrompt:` — auto-submitted first user turn when the agent runs as the main session agent (via `--agent` or the `agent` setting); irrelevant for orchestrator-invoked workers.
   - `color:` — display color in the task list (cosmetic).
 
 > **FORBIDDEN FIELDS:** `max_output_tokens`, `enable_write_tools`, `enable_mcp_tools`, `enable_subagent_tools`, `planning-mode`. These are foreign (Antigravity) fields. Claude Code does not recognize them; emitting them is a schema violation that `qa-validator` MUST reject. Any key outside the documented set above is likewise a violation.

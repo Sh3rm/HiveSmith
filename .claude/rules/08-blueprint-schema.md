@@ -17,11 +17,16 @@ To ensure perfect interoperability, the `domain-architect` MUST always output th
       "dependencies": ["string"]
     }
   ],
-  "mcp_servers": {
-    "server_name": {
+  "mcpServers": {
+    "stdio_server_name": {
       "command": "string",
       "args": ["string"],
       "env": {}
+    },
+    "remote_server_name": {
+      "type": "http",
+      "url": "string",
+      "headers": {}
     }
   },
   "workflow_dag": {
@@ -32,3 +37,5 @@ To ensure perfect interoperability, the `domain-architect` MUST always output th
 }
 ```
 *No deviation from this top-level key structure is permitted.*
+
+**`mcpServers` semantics (mirrors the official `.mcp.json` format 1:1, so `mcp-integrator` can emit entries verbatim):** local stdio servers use `command`/`args`/`env` (the `type` field is optional for them — Claude Code treats a typeless entry as stdio); remote servers use `url` and MUST carry an explicit `"type"` of `http` (preferred), `sse` (deprecated), or `ws` — a `url` entry without `type` is a configuration error that Claude Code skips at load time. Include only the entry shape actually needed; both are shown above for reference.

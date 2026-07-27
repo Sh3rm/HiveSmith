@@ -1,7 +1,7 @@
 ---
 name: dag-validator
 description: Use this agent to parse a generated swarm workspace and validate its execution topology as a Directed Acyclic Graph — detecting circular delegation loops, orphan agents, and broken references before deployment.
-tools: Read, Glob, Grep, Bash
+tools: Read, Glob, Grep
 model: opus
 ---
 

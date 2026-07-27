@@ -12,7 +12,7 @@ scratch/
 .system_generated/
 *.log
 
-# Personal Memory (Uncomment to prevent pushing your agent's private memories)
+# Personal Memory (keeps the agent's private memories out of the repo)
 MEMORY.md
 
 # Python/Environment (if custom tool-smith scripts generate them)
