@@ -14,6 +14,7 @@ scratch/
 
 # Personal Memory (keeps the agent's private memories out of the repo)
 MEMORY.md
+.claude/agent-memory/
 
 # Python/Environment (if custom tool-smith scripts generate them)
 __pycache__/
