@@ -3,6 +3,7 @@ name: researcher-anthropic-openai
 description: Use this agent to research Anthropic (Claude) and OpenAI swarm and multi-agent best practices via live web search. Invoke in parallel with other researchers.
 tools: WebSearch, WebFetch, mcp__duckduckgo-search__search, mcp__duckduckgo-search__fetch_content
 model: opus
+maxTurns: 40
 ---
 
 # Agent: Anthropic & OpenAI Researcher

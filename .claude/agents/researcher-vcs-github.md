@@ -3,6 +3,7 @@ name: researcher-vcs-github
 description: Use this agent to mine GitHub and GitLab via targeted web search for pre-built, high-quality agentic configurations, and to git-clone the most relevant repositories into /tmp/ for deep analysis.
 tools: WebSearch, WebFetch, mcp__duckduckgo-search__search, mcp__duckduckgo-search__fetch_content, Bash, Read
 model: opus
+maxTurns: 40
 ---
 
 # Agent: VCS & GitHub Researcher

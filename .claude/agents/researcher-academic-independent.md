@@ -3,6 +3,7 @@ name: researcher-academic-independent
 description: Use this agent for Ultra Deep Research across academic papers (MIT, arXiv) and independent AI researcher blogs for bleeding-edge Agentic AI findings. Invoke in parallel with other researchers.
 tools: WebSearch, WebFetch, mcp__duckduckgo-search__search, mcp__duckduckgo-search__fetch_content
 model: opus
+maxTurns: 40
 ---
 
 # Agent: Academic & Independent AI Researcher

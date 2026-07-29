@@ -18,20 +18,22 @@ HiveSmith is itself a swarm. An orchestrator (`CLAUDE.md`) coordinates 19 specia
 
 ```
 0. Pre-Flight Disambiguation — Challenge vague requests with clarifying questions (skipped when the request is explicit)
-1. Information Gathering    — Apply model routing, spawn domain researchers in parallel
-2. Synthesis                — Merge raw research into a unified architectural baseline
-3. Architecture             — Design the swarm blueprint with tier-based model routing
-4. Infrastructure & Safety  — Generate MCP configs, safety rules, telemetry, custom tools
-5. Context Optimization     — Compress the payload without losing architectural logic
-6. Persona Generation       — Write CLAUDE.md, .claude/agents/*.md, rules, and settings to disk
-7. Evaluation & QA          — Simulate edge cases, validate DAG topology, verify dependencies
+1. Information Gathering     — Apply model routing, spawn domain researchers in parallel
+2. Synthesis & Architecture  — Merge raw research into a unified baseline, then design the blueprint
+3. Infrastructure & Safety   — Generate MCP configs, safety rules + guard hooks, telemetry, custom tools
+4. Context Optimization      — Compress the payload without losing architectural logic
+5. Persona Generation        — Write CLAUDE.md, .claude/agents/*.md, rules, and settings to disk
+6. Evaluation & QA           — Simulate edge cases, audit anti-patterns, validate DAG topology and dependencies
+7. Final Delivery            — Hand the validated swarm tree to the user
 ```
 
 If QA or DAG validation finds issues, the pipeline loops back for refinement automatically.
 
 ## Key Design Decisions
 
-- **Native Claude Code Sub-Agents.** Every worker persona is a `.claude/agents/<name>.md` file with the official frontmatter schema (`name`, `description`, `tools`, `model`). The orchestrator delegates through Claude Code's Agent tool, so each worker runs in an isolated context window with a least-privilege tool allowlist enforced by the harness itself — researchers can search but not write, validators can read but not modify.
+- **Native Claude Code Sub-Agents.** Every worker persona is a `.claude/agents/<name>.md` file with the official frontmatter schema (`name`, `description`, `tools`, `model`, plus advanced keys — `effort`, `maxTurns`, `memory` — where the role justifies them). The orchestrator delegates through Claude Code's Agent tool, so each worker runs in an isolated context window with a least-privilege tool allowlist enforced by the harness itself — researchers can search but not write, validators can read but not modify.
+
+- **Deterministic Guard Hooks.** The Destructive Action Barrier is not just prose: a `PreToolUse` hook (`.claude/hooks/block-destructive.py`) deterministically blocks `rm -rf`, `mkfs`, force-pushes, SQL `DROP`s, and cloud resource deletions before they run. Generated swarms ship the same dual layer — a rules file for context plus a domain-tailored guard hook for enforcement.
 
 - **Tier-Based Model Routing.** HiveSmith assigns models using Claude aliases (`fable`, `opus`, `sonnet`, `haiku`) based on cognitive load. Heavy reasoning and orchestration gets `fable` (Fable 5), complex coding gets `opus` (Opus 5), research gets `sonnet` (Sonnet 5), fast scanning gets `haiku` (Haiku 4.5). When Anthropic ships new models, the aliases resolve to the latest versions automatically.
 
@@ -106,7 +108,9 @@ HiveSmith/
 ├── .mcp.json                          # Project-scoped MCP servers (optional search fallback)
 ├── research-archive/                  # Frozen research corpus from past generation runs (not live config)
 └── .claude/
-    ├── settings.json                  # Default model + project settings
+    ├── settings.json                  # Default model, MCP allowlist + guard-hook wiring
+    ├── hooks/
+    │   └── block-destructive.py       # PreToolUse guard: deterministic Destructive Action Barrier
     ├── rules/                         # Auto-loaded global rules
     │   ├── 01-web-search-mandatory.md
     │   ├── 02-destructive-action-barrier.md
@@ -115,7 +119,8 @@ HiveSmith/
     │   ├── 05-idempotency-and-state.md
     │   ├── 06-human-in-the-loop.md
     │   ├── 07-conflict-resolution.md
-    │   └── 08-blueprint-schema.md
+    │   ├── 08-blueprint-schema.md
+    │   └── 09-swarm-quality-doctrine.md
     └── agents/                        # 19 sub-agent definitions
         ├── context-optimizer.md
         ├── dag-validator.md
@@ -142,16 +147,17 @@ Generated swarms follow the same layout: a plain-markdown `CLAUDE.md` orchestrat
 
 ## Global Rules
 
-All agents (both HiveSmith's own and any it generates) operate under 8 global rules:
+All agents (both HiveSmith's own and any it generates) operate under 9 global rules:
 
 1. **Web Search Mandatory** — No hallucinated packages, versions, or configs
-2. **Destructive Action Barrier** — No `rm -rf`, `DROP TABLE`, or cloud deletions without human approval
-3. **Agent-as-Code Standard** — Claude Code native file formats, least-privilege tool allowlists, dynamic model routing
+2. **Destructive Action Barrier** — No `rm -rf`, `DROP TABLE`, or cloud deletions without human approval; enforced by a deterministic `PreToolUse` guard hook, not just prose
+3. **Agent-as-Code Standard** — The canonical Claude Code schema: file formats, frontmatter keys, context inheritance, hooks doctrine, coordination mechanisms, and model routing — single source of truth for the whole workspace
 4. **Prompt Injection Shield** — All external inputs treated as untrusted
 5. **Idempotency & State Safety** — Operations must be safe to re-run
 6. **Human-in-the-Loop** — Agents pause and ask when facing critical ambiguity
 7. **Conflict Resolution** — Orchestrator resolves inter-agent disagreements; safety wins by default
-8. **Blueprint Schema** — Enforced JSON structure for all swarm blueprints
+8. **Blueprint Schema** — Enforced JSON structure for all swarm blueprints, including decomposition justification and guard-hook sections
+9. **Swarm Quality Doctrine** — Anthropic's measured anti-patterns encoded as hard checks: single-agent justification, context-boundary (not phase) decomposition, ~200-line prompt budgets, verifier hardening, just-in-time context
 
 ## Contributing
 
