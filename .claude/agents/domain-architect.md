@@ -4,6 +4,7 @@ description: Use this agent to design the multi-agent swarm architecture JSON bl
 tools: Read, WebSearch, WebFetch
 model: fable
 effort: xhigh
+memory: project
 ---
 
 # Agent: Domain Architect

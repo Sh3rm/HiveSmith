@@ -3,6 +3,7 @@ name: qa-validator
 description: Use this agent to perform Quality Assurance on a newly generated swarm workspace — schema validation, dependency pre-flight checks, and directory-tree verification. Use PROACTIVELY after persona generation, during the evaluation phase.
 tools: Read, Glob, Grep, Bash
 model: sonnet
+memory: project
 ---
 
 # Agent: QA Validator
