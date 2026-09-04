@@ -3,10 +3,11 @@
 **You describe the swarm. HiveSmith forges it.**
 
 [![License](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](LICENSE)
-[![Powered by](https://img.shields.io/badge/Powered_by-Claude_Code-8b5cf6.svg)](https://claude.ai)
+[![Powered by](https://img.shields.io/badge/Powered_by-Claude_Code-8b5cf6.svg)](https://code.claude.com/docs)
+[![Verified against](https://img.shields.io/badge/Claude_Code-v2.1.260-22c55e.svg)](https://github.com/anthropics/claude-code/blob/main/CHANGELOG.md)
 [![Agents](https://img.shields.io/badge/Sub--Agents-19-orange.svg)](#agent-roster)
 
-A meta-agent system that designs and generates production-ready multi-agent swarms. Built for the [Claude Code](https://claude.ai) CLI ecosystem.
+A meta-agent system that designs and generates production-ready multi-agent swarms. Built for the [Claude Code](https://code.claude.com/docs) CLI ecosystem.
 
 You describe what you need. HiveSmith researches the domain, architects the agent hierarchy, writes every prompt and config file, validates the topology, and delivers a working swarm — ready to run with `claude`.
 
@@ -71,11 +72,11 @@ All 19 sub-agents live in `.claude/agents/`:
 
 ## 🚀 Quick Start
 
-HiveSmith is powered by [Claude Code](https://claude.ai).
+HiveSmith is powered by [Claude Code](https://code.claude.com/docs).
 
 **1. Prerequisites:**
 
-- **[Claude Code CLI](https://claude.ai)** — installed and authenticated (`claude` command available)
+- **[Claude Code CLI](https://code.claude.com/docs/en/quickstart)** — installed and authenticated (`claude` command available). Version **2.1.257 or newer** is required for the full doctrine (partial `maxTurns` results, `SubagentStop` hooks, the `experimental.cacheTtl` key, and the project-settings `defaultMode` behaviour the QA gate checks); tested against v2.1.260
 - **[uv](https://docs.astral.sh/uv/)** — optional, only for the `uvx` DuckDuckGo MCP fallback
 
 **2. Clone this repository:**
