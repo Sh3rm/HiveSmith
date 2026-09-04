@@ -9,14 +9,17 @@ To ensure perfect interoperability, the `domain-architect` MUST always output th
   "version": "string",
   "domain": "string",
   "single_agent_justification": "string (REQUIRED — why one well-tooled agent cannot do this job: context pollution, true parallelism, or specialization threshold; multi-agent systems cost 3-15x tokens, so the burden of proof is on decomposition)",
+  "default_model": "string (REQUIRED — 'fable'|'opus'|'sonnet'|'haiku'; written verbatim to the generated .claude/settings.json `model` key; the orchestrator CLAUDE.md runs on it; 'opus' unless the Rule 03 §7 budget justifies otherwise)",
   "agents": [
     {
       "id": "string",
       "role": "string",
-      "model": "string ('fable', 'opus', 'sonnet', 'haiku', or 'inherit' — maps 1:1 to the agent frontmatter `model` key; never a full model version string)",
+      "model": "string ('fable', 'opus', 'sonnet', 'haiku', or 'inherit' — maps 1:1 to the agent frontmatter `model` key; never a full model version string; subject to the Rule 03 §7 tier budget)",
+      "tier_evidence": "string (REQUIRED when model is 'opus' or 'fable' — the benchmark/complexity evidence that justifies the tier; omit for 'sonnet'/'haiku'/'inherit')",
       "tools_required": ["string"],
+      "tools_justification": "string (REQUIRED when tools_required includes 'Agent', 'Agent(<type>)' or 'SendMessage', or is intentionally empty to inherit all tools — names the peer/delegation relationship and its purpose per Rule 03 §5)",
       "dependencies": ["string"],
-      "effort": "string (OPTIONAL — 'low'|'medium'|'high'|'xhigh'|'max'; only when the role's reasoning depth deviates from the session default)",
+      "effort": "string (OPTIONAL — 'low'|'medium'|'high'|'xhigh'; 'max' is FORBIDDEN in generated swarms; 'xhigh' requires a justification in the role string)",
       "isolation": "string (OPTIONAL — 'worktree'; only for agents writing files inside the same git repo in parallel with other writers)",
       "maxTurns": "number (OPTIONAL — runaway cap for loop-prone workers)",
       "memory": "string (OPTIONAL — 'user'|'project'|'local'; only for agents whose judgment improves across runs)"
@@ -28,6 +31,13 @@ To ensure perfect interoperability, the `domain-architect` MUST always output th
       "type": "string ('command'|'prompt'|'agent'|'http'|'mcp_tool')",
       "purpose": "string",
       "matcher_or_pattern": "string"
+    }
+  ],
+  "workflows": [
+    {
+      "name": "string (OPTIONAL section — a saved dynamic-workflow script the swarm ships at .claude/workflows/<name>.js, per Rule 03 §5; only for repeatable fan-out-with-verification jobs)",
+      "purpose": "string",
+      "phases": ["string"]
     }
   ],
   "mcpServers": {
@@ -49,6 +59,6 @@ To ensure perfect interoperability, the `domain-architect` MUST always output th
   }
 }
 ```
-*No deviation from this top-level key structure is permitted. The `hooks` top-level section and the per-agent `effort`/`isolation`/`maxTurns`/`memory` keys are OPTIONAL — omit them entirely when not needed; when present they must follow the shapes above.*
+*No deviation from this top-level key structure is permitted. The `hooks` and `workflows` top-level sections and the per-agent `effort`/`isolation`/`maxTurns`/`memory` keys are OPTIONAL — omit them entirely when not needed; `tier_evidence` and `tools_justification` are conditionally REQUIRED as stated; when present all must follow the shapes above.*
 
-**`mcpServers` semantics (mirrors the official `.mcp.json` format 1:1, so `mcp-integrator` can emit entries verbatim):** local stdio servers use `command`/`args`/`env` (the `type` field is optional for them — Claude Code treats a typeless entry as stdio); remote servers use `url` and MUST carry an explicit `"type"` of `http` (preferred), `sse` (deprecated), or `ws` — a `url` entry without `type` is a configuration error that Claude Code skips at load time. Include only the entry shape actually needed; both are shown above for reference.
+**`mcpServers` semantics (mirrors the official `.mcp.json` format 1:1, so `mcp-integrator` can emit entries verbatim):** local stdio servers use `command`/`args`/`env` (the `type` field is optional for them — Claude Code treats a typeless entry as stdio); remote servers use `url` and MUST carry an explicit `"type"` of `http` (preferred), `sse` (deprecated), or `ws` — a `url` entry without `type` is reported by Claude Code as a configuration error (`has a "url" but no "type"`) and the server does not load. Include only the entry shape actually needed; both are shown above for reference.
