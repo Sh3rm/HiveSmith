@@ -4,7 +4,7 @@
 
 [![License](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](LICENSE)
 [![Powered by](https://img.shields.io/badge/Powered_by-Claude_Code-8b5cf6.svg)](https://code.claude.com/docs)
-[![Verified against](https://img.shields.io/badge/Claude_Code-v2.1.260-22c55e.svg)](https://github.com/anthropics/claude-code/blob/main/CHANGELOG.md)
+[![Verified against](https://img.shields.io/badge/Claude_Code-v2.1.280-22c55e.svg)](https://github.com/anthropics/claude-code/blob/main/CHANGELOG.md)
 [![Agents](https://img.shields.io/badge/Sub--Agents-19-orange.svg)](#agent-roster)
 
 A meta-agent system that designs and generates production-ready multi-agent swarms. Built for the [Claude Code](https://code.claude.com/docs) CLI ecosystem.
@@ -36,7 +36,7 @@ If QA or DAG validation finds issues, the pipeline loops back for refinement aut
 
 - **Deterministic Guard Hooks.** The Destructive Action Barrier is not just prose: a `PreToolUse` hook (`.claude/hooks/block-destructive.py`) deterministically blocks `rm -rf`, `mkfs`, force-pushes, SQL `DROP`s, and cloud resource deletions before they run. Generated swarms ship the same dual layer — a rules file for context plus a domain-tailored guard hook for enforcement.
 
-- **Tier-Based Model Routing with a Budget.** HiveSmith assigns models using Claude aliases (`fable`, `opus`, `sonnet`, `haiku`) based on cognitive load. Heavy reasoning and orchestration gets `fable` (Fable 5.1), complex coding gets `opus` (Opus 5), research gets `sonnet` (Sonnet 5), fast scanning gets `haiku` (Haiku 4.5). When Anthropic ships new models, the aliases resolve to the latest versions automatically. Generated swarms run on *your* subscription, so they follow a hard tier budget: an `opus` orchestrator, `sonnet` workers by default, `haiku` for mechanical roles, `opus` workers only with benchmark evidence, at most one `fable` agent, and never `effort: max` — the QA gate rejects rosters that break it. You can always edit the generated `settings.json` and agent frontmatter by hand afterwards. Operators can still re-route everything at launch with `CLAUDE_CODE_SUBAGENT_MODEL` / `CLAUDE_CODE_SUBAGENT_MODEL_FORCE`.
+- **Tier-Based Model Routing with a Budget.** HiveSmith assigns models using Claude aliases (`fable`, `opus`, `sonnet`, `haiku`) based on cognitive load. Heavy reasoning and orchestration gets `fable` (Fable 5.1), complex coding gets `opus` (Opus 5.5), research gets `sonnet` (Sonnet 5), fast scanning gets `haiku` (Haiku 4.5). When Anthropic ships new models, the aliases resolve to the latest versions automatically. Generated swarms run on *your* subscription, so they follow a hard tier budget: an `opus` orchestrator, `sonnet` workers by default, `haiku` for mechanical roles, `opus` workers only with benchmark evidence, at most one `fable` agent, and never `effort: max` — the QA gate rejects rosters that break it. Effort is left at each model's official default unless the blueprint sets one (Opus 5.5 defaults to `medium`; a generated `settings.json` may carry `effortLevel: high` when the domain justifies it, and you can cap everything with `maxEffortLevel`). You can always edit the generated `settings.json` and agent frontmatter by hand afterwards. Operators can still re-route everything at launch with `CLAUDE_CODE_SUBAGENT_MODEL` (default for agents without a `model`) plus `CLAUDE_CODE_SUBAGENT_MODEL_FORCE=1` (makes it override every definition).
 
 - **Research Before Architecture.** Every generated swarm includes its own researcher agents. HiveSmith never relies on pre-trained knowledge for domain-specific decisions. It searches the web first, every time — via Claude Code's native `WebSearch`/`WebFetch` tools, with an optional tokenless [duckduckgo-mcp-server](https://pypi.org/project/duckduckgo-mcp-server/) fallback in `.mcp.json`.
 
@@ -76,7 +76,7 @@ HiveSmith is powered by [Claude Code](https://code.claude.com/docs).
 
 **1. Prerequisites:**
 
-- **[Claude Code CLI](https://code.claude.com/docs/en/quickstart)** — installed and authenticated (`claude` command available). Version **2.1.257 or newer** is required for the full doctrine (partial `maxTurns` results, `SubagentStop` hooks, the `experimental.cacheTtl` key, and the project-settings `defaultMode` behaviour the QA gate checks); tested against v2.1.260
+- **[Claude Code CLI](https://code.claude.com/docs/en/quickstart)** — installed and authenticated (`claude` command available). Version **2.1.280 or newer** is required for the full doctrine (the `opus` alias resolving to Opus 5.5, the `omitClaudeMd` frontmatter key, `maxEffortLevel`, partial `maxTurns` results, `SubagentStop` hooks, the `experimental.cacheTtl` key, and the project-settings `defaultMode` behaviour the QA gate checks); tested against v2.1.280
 - **[uv](https://docs.astral.sh/uv/)** — optional, only for the `uvx` DuckDuckGo MCP fallback
 
 **2. Clone this repository:**
@@ -94,7 +94,7 @@ claude "Build me a Kubernetes monitoring swarm with Prometheus and Grafana integ
 
 That's it. HiveSmith will research the domain, architect the agent hierarchy, write every prompt and config file, validate the output, and deliver a working swarm into your target directory.
 
-> **Model configuration is automatic.** The default model is set in `.claude/settings.json`, and each sub-agent's `model:` frontmatter uses Claude aliases (`fable`, `opus`, `sonnet`, `haiku`) that automatically resolve to the latest available versions (currently Fable 5.1, Opus 5, Sonnet 5, Haiku 4.5). You don't need to edit model names manually. Doctrine last verified against Claude Code **v2.1.260** (2026-09-04).
+> **Model configuration is automatic.** The default model is set in `.claude/settings.json`, and each sub-agent's `model:` frontmatter uses Claude aliases (`fable`, `opus`, `sonnet`, `haiku`) that automatically resolve to the latest available versions (currently Fable 5.1, Opus 5.5, Sonnet 5, Haiku 4.5). You don't need to edit model names manually. Doctrine last verified against Claude Code **v2.1.280** (2026-09-23).
 
 > **File access is native.** Claude Code's built-in `Read`/`Write`/`Edit`/`Bash` tools (governed by its permission system) handle all filesystem work — no filesystem MCP server is needed or used.
 

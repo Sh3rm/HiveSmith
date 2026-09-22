@@ -1,6 +1,9 @@
 {
   "model": "fable",
-  "enabledMcpjsonServers": ["duckduckgo-search"],
+  "effortLevel": "high",
+  "enabledMcpjsonServers": [
+    "duckduckgo-search"
+  ],
   "hooks": {
     "PreToolUse": [
       {

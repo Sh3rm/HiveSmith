@@ -10,6 +10,7 @@ To ensure perfect interoperability, the `domain-architect` MUST always output th
   "domain": "string",
   "single_agent_justification": "string (REQUIRED — why one well-tooled agent cannot do this job: context pollution, true parallelism, or specialization threshold; multi-agent systems cost 3-15x tokens, so the burden of proof is on decomposition)",
   "default_model": "string (REQUIRED — 'fable'|'opus'|'sonnet'|'haiku'; written verbatim to the generated .claude/settings.json `model` key; the orchestrator CLAUDE.md runs on it; 'opus' unless the Rule 03 §7 budget justifies otherwise)",
+  "default_effort": "string (OPTIONAL — 'low'|'medium'|'high'|'xhigh'; written to the generated .claude/settings.json `effortLevel` key, which applies to every model in the swarm; omit to run each model at its official default ('medium' on Opus 5.5, 'high' elsewhere); 'high'/'xhigh' require a stated reason inside `single_agent_justification`; 'max' is FORBIDDEN)",
   "agents": [
     {
       "id": "string",
@@ -59,6 +60,6 @@ To ensure perfect interoperability, the `domain-architect` MUST always output th
   }
 }
 ```
-*No deviation from this top-level key structure is permitted. The `hooks` and `workflows` top-level sections and the per-agent `effort`/`isolation`/`maxTurns`/`memory` keys are OPTIONAL — omit them entirely when not needed; `tier_evidence` and `tools_justification` are conditionally REQUIRED as stated; when present all must follow the shapes above.*
+*No deviation from this top-level key structure is permitted. The `default_effort` key, the `hooks` and `workflows` top-level sections and the per-agent `effort`/`isolation`/`maxTurns`/`memory` keys are OPTIONAL — omit them entirely when not needed; `tier_evidence` and `tools_justification` are conditionally REQUIRED as stated; when present all must follow the shapes above.*
 
-**`mcpServers` semantics (mirrors the official `.mcp.json` format 1:1, so `mcp-integrator` can emit entries verbatim):** local stdio servers use `command`/`args`/`env` (the `type` field is optional for them — Claude Code treats a typeless entry as stdio); remote servers use `url` and MUST carry an explicit `"type"` of `http` (preferred), `sse` (deprecated), or `ws` — a `url` entry without `type` is reported by Claude Code as a configuration error (`has a "url" but no "type"`) and the server does not load. Include only the entry shape actually needed; both are shown above for reference.
+**`mcpServers` semantics (mirrors the official `.mcp.json` format 1:1, so `mcp-integrator` can emit entries verbatim):** local stdio servers use `command`/`args`/`env` (the `type` field is optional for them — Claude Code treats a typeless entry as stdio); remote servers use `url` and MUST carry an explicit `"type"` of `http` (preferred), `sse` (deprecated), or `ws` — a `url` entry without `type` is reported by Claude Code as a configuration error (`has a "url" but no "type"`) and the server does not load. Include only the entry shape actually needed; both are shown above for reference. `"type": "sdk"` entries are never valid in a swarm's `.mcp.json` — Claude Code skips them with a warning (≥ 2.1.274), since only an SDK host application can register in-process servers.
