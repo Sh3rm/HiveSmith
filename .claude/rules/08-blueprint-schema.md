@@ -20,7 +20,7 @@ To ensure perfect interoperability, the `domain-architect` MUST always output th
       "tools_required": ["string"],
       "tools_justification": "string (REQUIRED when tools_required includes 'Agent', 'Agent(<type>)' or 'SendMessage', or is intentionally empty to inherit all tools — names the peer/delegation relationship and its purpose per Rule 03 §5)",
       "dependencies": ["string"],
-      "effort": "string ('low'|'medium'|'high'|'xhigh'; REQUIRED and 'high' for verification/QA/reviewer and research roles per Rule 03 §7, otherwise OPTIONAL — omitted, the agent runs at the session level, 'medium' on Opus 5.5 and Sonnet 5.5, 'high' on Fable; omit for 'haiku' (no effort support); 'max' is FORBIDDEN in generated swarms; 'xhigh' requires a measured-gain justification in the role string)",
+      "effort": "string ('low'|'medium'|'high'|'xhigh'; REQUIRED and 'high' for non-haiku verification/QA/reviewer and research roles per Rule 03 §7, otherwise OPTIONAL — omitted, the agent runs at the session level, 'medium' on Opus 5.5 and Sonnet 5.5, 'high' on Fable; omit for 'haiku' (no effort support); 'max' is FORBIDDEN in generated swarms; 'xhigh' requires a measured-gain justification in the role string)",
       "isolation": "string (OPTIONAL — 'worktree'; only for agents writing files inside the same git repo in parallel with other writers)",
       "maxTurns": "number (OPTIONAL — runaway cap for loop-prone workers)",
       "memory": "string (OPTIONAL — 'user'|'project'|'local'; only for agents whose judgment improves across runs)"
