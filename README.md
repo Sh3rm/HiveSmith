@@ -5,32 +5,33 @@
 [![License](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](LICENSE)
 [![Powered by](https://img.shields.io/badge/Powered_by-Claude_Code-8b5cf6.svg)](https://code.claude.com/docs)
 [![Verified against](https://img.shields.io/badge/Claude_Code-v2.1.284-22c55e.svg)](https://github.com/anthropics/claude-code/blob/main/CHANGELOG.md)
-[![Agents](https://img.shields.io/badge/Sub--Agents-19-orange.svg)](#agent-roster)
+[![Agents](https://img.shields.io/badge/Sub--Agents-15-orange.svg)](#agent-roster)
 
 A meta-agent system that designs and generates production-ready multi-agent swarms. Built for the [Claude Code](https://code.claude.com/docs) CLI ecosystem.
 
 You describe what you need. HiveSmith researches the domain, architects the agent hierarchy, writes every prompt and config file, validates the topology, and delivers a working swarm — ready to run with `claude`.
 
-> **HiveSmith** — the smith that forges hives. Sister project of [SwarmForge](https://github.com/Sh3rm/SwarmForge) (the Gemini/Antigravity edition): same architecture, same 19 agents, same pipeline — rebuilt from the ground up on Claude Code's native primitives: sub-agents, auto-loaded rules, and project MCP config.
+> **HiveSmith** — the smith that forges hives. Sister project of [SwarmForge](https://github.com/Sh3rm/SwarmForge) (the Gemini/Antigravity edition): same lineage, rebuilt from the ground up on Claude Code's native primitives: sub-agents, auto-loaded rules, and project MCP config. HiveSmith has since moved to a leaner pipeline with fewer agents.
 
 ## How It Works
 
-HiveSmith is itself a swarm. An orchestrator (`CLAUDE.md`) coordinates 19 specialized sub-agents — each a real Claude Code sub-agent with its own isolated context window, tool allowlist, and model tier — through an interactive pre-flight step plus a 7-step pipeline:
+HiveSmith is itself a swarm. An orchestrator (`CLAUDE.md`) coordinates 15 specialized sub-agents — each a real Claude Code sub-agent with its own isolated context window, tool allowlist, and model tier — through a clarifying step plus six working steps:
 
 ```
-0. Pre-Flight Disambiguation — Challenge vague requests with clarifying questions (skipped when the request is explicit)
-1. Information Gathering     — Apply model routing, spawn domain researchers in parallel
-2. Synthesis & Architecture  — Merge raw research into a unified baseline, then design the blueprint
-3. Infrastructure & Safety   — Generate MCP configs, safety rules + guard hooks, telemetry, custom tools
-4. Context Optimization      — Compress the payload without losing architectural logic
-5. Persona Generation        — Write CLAUDE.md, .claude/agents/*.md, rules, and settings to disk
-6. Evaluation & QA           — Simulate edge cases, audit anti-patterns, validate DAG topology and dependencies
-7. Final Delivery            — Hand the validated swarm tree to the user
+0. Clarify                   — Ask about missing constraints that change the design (skipped when the request is explicit)
+1. Research                  — Launch only the researchers the request needs, in parallel; save their reports as files
+2. Architecture              — Read the raw reports, resolve conflicts, design the blueprint (roster, tiers, state, hooks)
+3. Infrastructure & Safety   — Safety rules + guard hooks; MCP config and custom tools only when the blueprint needs them
+4. Persona Generation        — Write CLAUDE.md, .claude/agents/*.md, rules, and settings to disk
+5. Verification              — Fresh-context evaluators audit prompts, schemas, dependencies and the DAG in parallel
+6. Delivery                  — Hand the verified swarm tree to the user
 ```
 
-If QA or DAG validation finds issues, the pipeline loops back for refinement automatically.
+If verification finds issues, the orchestrator routes them back to the architect or the persona engineer and re-verifies what changed. The user's request travels verbatim to every worker; research reports travel as file paths, never as compressed summaries.
 
 ## Key Design Decisions
+
+- **Fewest Agents the Work Justifies.** Multi-agent systems typically spend 3-10x the tokens of a single agent on the same task, and splitting one body of work into sequential phases loses context at every handoff. So every agent in a generated swarm must stand on a stated ground — context isolation, genuinely parallel work, or a specialization threshold — and there is no target roster size; a single well-tooled agent with rules and hooks is a valid result. Generated instruction files keep only what the model cannot infer on its own, without stacked CRITICAL/MUST emphasis or role inflation (Rule 09).
 
 - **Native Claude Code Sub-Agents.** Every worker persona is a `.claude/agents/<name>.md` file with the official frontmatter schema (`name`, `description`, `tools`, `model`, plus advanced keys — `effort`, `maxTurns`, `memory` — where the role justifies them). The orchestrator delegates through Claude Code's Agent tool, so each worker runs in an isolated context window with a least-privilege tool allowlist enforced by the harness itself — researchers can search but not write, validators can read but not modify.
 
@@ -44,21 +45,17 @@ If QA or DAG validation finds issues, the pipeline loops back for refinement aut
 
 ## Agent Roster
 
-All 19 sub-agents live in `.claude/agents/`:
+All 15 sub-agents live in `.claude/agents/`:
 
 | Agent | Role | Default Tier |
 |---|---|---|
-| `domain-architect` | Designs swarm topology with benchmark-driven model selection | Fable |
+| `domain-architect` | Reconciles the research and designs the blueprint: roster, tiers, shared state, hooks | Fable |
 | `persona-engineer` | Writes all system prompts (CLAUDE.md, .claude/agents/*.md) | Fable |
 | `prompt-evaluator` | Simulates edge cases against generated prompts | Fable |
 | `safety-engineer` | Generates domain-specific safety rules | Fable |
 | `tool-smith` | Builds custom scripts when standard MCP tools aren't enough | Fable |
-| `memory-manager` | Designs shared context and persistence layers | Fable |
-| `researcher-synthesizer` | Merges all research into a single baseline | Fable |
-| `context-optimizer` | Compresses payloads without losing architectural logic | Opus |
 | `mcp-integrator` | Generates the project-root `.mcp.json` for the target swarm | Opus |
 | `dag-validator` | Validates swarm topology — detects cycles, orphan agents, broken links | Opus |
-| `telemetry-architect` | Designs logging, tracing, and metrics standards | Opus |
 | `researcher-google-cloud` | Google Cloud, Gemini best practices | Opus |
 | `researcher-anthropic-openai` | Anthropic & OpenAI multi-agent patterns | Opus |
 | `researcher-tech-stack` | Version verification, deprecation checks | Opus |
@@ -124,12 +121,10 @@ HiveSmith/
     │   ├── 07-conflict-resolution.md
     │   ├── 08-blueprint-schema.md
     │   └── 09-swarm-quality-doctrine.md
-    └── agents/                        # 19 sub-agent definitions
-        ├── context-optimizer.md
+    └── agents/                        # 15 sub-agent definitions
         ├── dag-validator.md
         ├── domain-architect.md
         ├── mcp-integrator.md
-        ├── memory-manager.md
         ├── persona-engineer.md
         ├── prompt-evaluator.md
         ├── qa-validator.md
@@ -138,11 +133,9 @@ HiveSmith/
         ├── researcher-anthropic-openai.md
         ├── researcher-google-cloud.md
         ├── researcher-security.md
-        ├── researcher-synthesizer.md
         ├── researcher-tech-stack.md
         ├── researcher-vcs-github.md
         ├── safety-engineer.md
-        ├── telemetry-architect.md
         └── tool-smith.md
 ```
 
@@ -159,8 +152,8 @@ All agents (both HiveSmith's own and any it generates) operate under 9 global ru
 5. **Idempotency & State Safety** — Operations must be safe to re-run
 6. **Human-in-the-Loop** — Agents pause and ask when facing critical ambiguity
 7. **Conflict Resolution** — Orchestrator resolves inter-agent disagreements; safety wins by default
-8. **Blueprint Schema** — Enforced JSON structure for all swarm blueprints, including decomposition justification and guard-hook sections
-9. **Swarm Quality Doctrine** — Anthropic's measured anti-patterns encoded as hard checks: single-agent justification, context-boundary (not phase) decomposition, ~200-line prompt budgets, verifier hardening, just-in-time context
+8. **Blueprint Schema** — Enforced JSON structure for all swarm blueprints, including per-agent decomposition justification, shared-state and guard-hook sections
+9. **Swarm Quality Doctrine** — Anthropic's guidance and published research encoded as hard checks: single-agent justification, context-boundary (not phase) decomposition, ~200-line prompt budgets, verifier hardening, just-in-time context, instruction files written for current models
 
 ## Contributing
 

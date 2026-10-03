@@ -8,7 +8,7 @@ To ensure perfect interoperability, the `domain-architect` MUST always output th
   "swarm_name": "string",
   "version": "string",
   "domain": "string",
-  "single_agent_justification": "string (REQUIRED — why one well-tooled agent cannot do this job: context pollution, true parallelism, or specialization threshold; multi-agent implementations typically use 3-10x the tokens of a single agent on the same task, and ~15x the tokens of a chat interaction, so the burden of proof is on decomposition — see Rule 09 §1)",
+  "single_agent_justification": "string (REQUIRED — for a multi-agent roster: why one well-tooled agent cannot do this job, naming for EACH agent in the roster which ground it stands on: context pollution, true parallelism, or specialization threshold; for a single-agent design, where `agents` is an empty array and the CLAUDE.md orchestrator works alone: why one agent suffices; multi-agent implementations typically use 3-10x the tokens of a single agent on the same task, and ~15x the tokens of a chat interaction, so the burden of proof is on decomposition — see Rule 09 §1)",
   "default_model": "string (REQUIRED — 'fable'|'opus'|'sonnet'|'haiku'; written verbatim to the generated .claude/settings.json `model` key; the orchestrator CLAUDE.md runs on it; 'opus' unless the Rule 03 §7 budget justifies otherwise)",
   "default_effort": "string (OPTIONAL — 'low'|'medium'|'high'|'xhigh'; written to the generated .claude/settings.json `effortLevel` key, which applies to every model in the swarm; omit to run each model at its official default ('medium' on Opus 5.5 and Sonnet 5.5, 'high' on Fable; Haiku 4.5 has no effort); 'high'/'xhigh' require a stated reason inside `single_agent_justification`; 'max' is FORBIDDEN)",
   "agents": [
@@ -28,10 +28,19 @@ To ensure perfect interoperability, the `domain-architect` MUST always output th
   ],
   "hooks": [
     {
-      "event": "string (OPTIONAL section — e.g. 'PreToolUse'; guard hooks the swarm ships in .claude/settings.json, per Rule 02 §4)",
+      "event": "string (OPTIONAL section — e.g. 'PreToolUse'; hooks the swarm ships in .claude/settings.json: guard hooks per Rule 02 §4, written by `safety-engineer`, and observability hooks such as a `PostToolUse` audit log, written by `persona-engineer`)",
       "type": "string ('command'|'prompt'|'agent'|'http'|'mcp_tool')",
       "purpose": "string",
       "matcher_or_pattern": "string"
+    }
+  ],
+  "state_artifacts": [
+    {
+      "artifact": "string (OPTIONAL section — a shared state file, record directory, `memory:` scope or code deliverable the swarm uses to share context across agents or runs, e.g. 'DECISIONS.md')",
+      "type": "string ('state-file'|'memory-scope'|'code-deliverable')",
+      "writers": ["string"],
+      "readers": ["string"],
+      "pruning": "string (when and by whom it is trimmed or archived)"
     }
   ],
   "workflows": [
@@ -60,6 +69,6 @@ To ensure perfect interoperability, the `domain-architect` MUST always output th
   }
 }
 ```
-*No deviation from this top-level key structure is permitted. The `default_effort` key, the `hooks` and `workflows` top-level sections and the per-agent `isolation`/`maxTurns`/`memory` keys are OPTIONAL — omit them entirely when not needed; `effort`, `tier_evidence` and `tools_justification` are conditionally REQUIRED as stated; when present all must follow the shapes above.*
+*No deviation from this top-level key structure is permitted. The `default_effort` key, the `hooks`, `state_artifacts` and `workflows` top-level sections and the per-agent `isolation`/`maxTurns`/`memory` keys are OPTIONAL — omit them entirely when not needed; `effort`, `tier_evidence` and `tools_justification` are conditionally REQUIRED as stated; when present all must follow the shapes above.*
 
 **`mcpServers` semantics (mirrors the official `.mcp.json` format 1:1, so `mcp-integrator` can emit entries verbatim):** local stdio servers use `command`/`args`/`env` (the `type` field is optional for them — Claude Code treats a typeless entry as stdio); remote servers use `url` and MUST carry an explicit `"type"` of `http` (preferred), `sse` (deprecated), or `ws` — a `url` entry without `type` is reported by Claude Code as a configuration error (`has a "url" but no "type"`) and the server does not load. Include only the entry shape actually needed; both are shown above for reference. `"type": "sdk"` entries are never valid in a swarm's `.mcp.json` — Claude Code skips them with a warning (≥ 2.1.274), since only an SDK host application can register in-process servers.
