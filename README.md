@@ -4,7 +4,7 @@
 
 [![License](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](LICENSE)
 [![Powered by](https://img.shields.io/badge/Powered_by-Claude_Code-8b5cf6.svg)](https://code.claude.com/docs)
-[![Verified against](https://img.shields.io/badge/Claude_Code-v2.1.288-22c55e.svg)](https://github.com/anthropics/claude-code/blob/main/CHANGELOG.md)
+[![Verified against](https://img.shields.io/badge/Claude_Code-v2.1.296-22c55e.svg)](https://github.com/anthropics/claude-code/blob/main/CHANGELOG.md)
 [![Agents](https://img.shields.io/badge/Sub--Agents-15-orange.svg)](#agent-roster)
 
 A meta-agent system that designs and generates production-ready agent swarms, sized to the work: from a single well-tooled agent to an orchestrator with specialised workers. Built for the [Claude Code](https://code.claude.com/docs) CLI ecosystem.
@@ -22,22 +22,22 @@ HiveSmith is itself a swarm. An orchestrator (`CLAUDE.md`) coordinates 15 specia
 1. Research                  — Launch only the researchers the request needs, in parallel; save their reports as files
 2. Architecture              — Read the raw reports, resolve conflicts, design the blueprint (roster, tiers, state, hooks)
 3. Infrastructure & Safety   — Safety rules + guard hooks; MCP config and custom tools only when the blueprint needs them
-4. Persona Generation        — Write CLAUDE.md, .claude/agents/*.md, rules, and settings to disk
+4. Persona Generation        — Write CLAUDE.md, .claude/agents/*.md, rules, settings and the operator README to disk
 5. Verification              — Fresh-context evaluators audit prompts, schemas, dependencies and the DAG in parallel
 6. Delivery                  — Hand the verified swarm tree to the user
 ```
 
-If verification finds issues, the orchestrator routes them back to the architect or the persona engineer and re-verifies what changed. The user's request travels verbatim to every worker; research reports travel as file paths, never as compressed summaries.
+If verification finds issues, the orchestrator routes each one back to the agent that wrote the file and re-verifies what changed, for at most three rounds; anything left is delivered as a named risk. The user's request travels verbatim to every worker; research reports travel as file paths, never as compressed summaries.
 
 ## Key Design Decisions
 
 - **Fewest Agents the Work Justifies.** Multi-agent systems typically spend 3-10x the tokens of a single agent on the same task, and splitting one body of work into sequential phases loses context at every handoff. So every agent in a generated swarm must stand on a stated ground — context isolation, genuinely parallel work, or a specialization threshold — and there is no target roster size; a single well-tooled agent with rules and hooks is a valid result. Generated instruction files keep only what the model cannot infer on its own, without stacked CRITICAL/MUST emphasis or role inflation (Rule 09).
 
-- **Native Claude Code Sub-Agents.** Every worker persona is a `.claude/agents/<name>.md` file with the official frontmatter schema (`name`, `description`, `tools`, `model`, plus advanced keys — `effort`, `maxTurns`, `memory` — where the role justifies them). The orchestrator delegates through Claude Code's Agent tool, so each worker runs in an isolated context window with a least-privilege tool allowlist enforced by the harness itself — researchers can search but not write, validators can read but not modify.
+- **Native Claude Code Sub-Agents.** Every worker persona is a `.claude/agents/<name>.md` file with the official frontmatter schema (`name`, `description`, `tools`, `model`, plus advanced keys — `effort`, `maxTurns`, `memory` — where the role justifies them). The orchestrator delegates through Claude Code's Agent tool, so each worker runs in an isolated context window with a least-privilege tool allowlist enforced by the harness itself — researchers can search but not write, and validators get no write tools (for the two that keep persistent memory, `qa-validator` and `prompt-evaluator`, Claude Code adds file tools for that memory, so their read-only scope rests on their instructions).
 
-- **Deterministic Guard Hooks.** The Destructive Action Barrier is not just prose: a `PreToolUse` hook (`.claude/hooks/block-destructive.py`) deterministically blocks `rm -rf`, `mkfs`, force-pushes, SQL `DROP`s, and cloud resource deletions before they run. Generated swarms ship the same dual layer — a rules file for context plus a domain-tailored guard hook for enforcement.
+- **Deterministic Guard Hooks.** The Destructive Action Barrier is not just prose: a `PreToolUse` hook (`.claude/hooks/block-destructive.py`, on the Bash and PowerShell tools) deterministically blocks `rm -rf`, `mkfs`, force-pushes, SQL `DROP`s, and cloud resource deletions before they run, including forms hidden in `bash -c`, `eval`, subshells or a quoted command name, and it fails closed (`onFailure: block`) if it cannot run. Generated swarms ship the same layers — a rules file for context, a domain-tailored guard hook, and permission deny and ask rules — plus scoped credentials and, where agents run commands on untrusted content, Claude Code's sandbox, because a pattern guard is a tripwire against mistakes, not a security boundary.
 
-- **Tier-Based Model Routing with a Budget.** HiveSmith assigns models using Claude aliases (`fable`, `opus`, `sonnet`, `haiku`) based on cognitive load. Heavy reasoning and orchestration gets `fable` (Fable 5.1), complex coding gets `opus` (Opus 5.5), research gets `sonnet` (Sonnet 5.5), fast scanning gets `haiku` (Haiku 5.5). When Anthropic ships new models, the aliases resolve to the latest versions automatically. Generated swarms run on *your* subscription, so they follow a hard tier budget: an `opus` orchestrator, `sonnet` workers by default, `haiku` for mechanical roles, `opus` workers only with benchmark evidence, at most one `fable` agent, and never `effort: max` — the QA gate rejects rosters that break it. Effort is left at each model's official default unless the blueprint sets one (Opus 5.5, Sonnet 5.5 and Haiku 5.5 default to `medium`, so verification and research roles in a generated swarm carry `effort: high` on every tier, and mechanical `haiku` roles carry `effort: low`; a generated `settings.json` may carry `effortLevel: high` when the domain justifies it, and you can cap everything with `maxEffortLevel`). You can always edit the generated `settings.json` and agent frontmatter by hand afterwards. Operators can still re-route everything at launch with `CLAUDE_CODE_SUBAGENT_MODEL` (default for agents without a `model`) plus `CLAUDE_CODE_SUBAGENT_MODEL_FORCE=1` (makes it override every definition).
+- **Tier-Based Model Routing with a Budget.** HiveSmith assigns models using Claude aliases (`fable`, `opus`, `sonnet`, `haiku`) based on cognitive load. In a generated swarm, heavy reasoning and architecture can get `fable` (Fable 5.1), orchestration and complex coding get `opus` (Opus 5.5), research and most workers get `sonnet` (Sonnet 5.5), and fast lookups and scanning get `haiku` (Haiku 5.5). When Anthropic ships new models, the aliases resolve to the latest versions automatically. Generated swarms run on *your* subscription, so they follow a hard tier budget: an `opus` orchestrator, `sonnet` workers by default, `haiku` for mechanical roles, `opus` workers only with benchmark evidence, at most one `fable` agent, and never `effort: max` — the QA gate rejects rosters that break it. Effort is left at each model's official default unless the blueprint sets one (Opus 5.5, Sonnet 5.5 and Haiku 5.5 default to `medium`, so verification and research roles in a generated swarm carry `effort: high` on every tier, and mechanical `haiku` roles carry `effort: low`; a generated `settings.json` may carry `effortLevel: high` when the domain justifies it, and you can cap everything with `maxEffortLevel`). You can always edit the generated `settings.json` and agent frontmatter by hand afterwards. Operators can still re-route everything at launch with `CLAUDE_CODE_SUBAGENT_MODEL` (default for agents without a `model`) plus `CLAUDE_CODE_SUBAGENT_MODEL_FORCE=1` (makes it override every definition).
 
 - **Research Before Architecture.** Every generated swarm can research its own domain, through dedicated researcher agents or, in a single-agent design, the orchestrator's own search tools. HiveSmith never relies on pre-trained knowledge for domain-specific decisions. It searches the web first, every time — via Claude Code's native `WebSearch`/`WebFetch` tools, with an optional tokenless [duckduckgo-mcp-server](https://pypi.org/project/duckduckgo-mcp-server/) fallback in `.mcp.json`.
 
@@ -62,7 +62,7 @@ All 15 sub-agents live in `.claude/agents/`:
 | `researcher-security` | OWASP, HITL, guardrail best practices | Opus |
 | `researcher-academic-independent` | arXiv, independent AI research blogs | Opus |
 | `researcher-vcs-github` | Mines GitHub/GitLab for existing agent configs | Opus |
-| `repo-analyzer-worker` | Fast concurrent scanning of cloned repos | Sonnet |
+| `repo-analyzer-worker` | Concurrent read-only scanning of cloned repos or your existing codebase | Sonnet |
 | `qa-validator` | Schema validation, dependency checks, pass/fail reporting | Sonnet |
 
 > "Default Tier" is set in each agent's `model:` frontmatter and applied automatically by Claude Code. HiveSmith's own roster is deliberately generously tiered — it is a creator, and the quality of what it forges is worth the tokens. The `haiku` tier remains part of the routing doctrine for the swarms HiveSmith generates.
@@ -73,8 +73,9 @@ HiveSmith is powered by [Claude Code](https://code.claude.com/docs).
 
 **1. Prerequisites:**
 
-- **[Claude Code CLI](https://code.claude.com/docs/en/quickstart)** — installed and authenticated (`claude` command available). Version **2.1.280 or newer** is required for the full doctrine (the `opus` alias resolving to Opus 5.5, the `omitClaudeMd` frontmatter key, `maxEffortLevel`, partial `maxTurns` results, `SubagentStop` hooks, the `experimental.cacheTtl` key, and the project-settings `defaultMode` behaviour the QA gate checks). The `sonnet` alias resolves to Sonnet 5.5 only on **2.1.284 or newer** and on the Anthropic API (older versions and other providers resolve an earlier Sonnet), and the `haiku` alias resolves to Haiku 5.5 only on **2.1.293 or newer** and on the Anthropic API (elsewhere it resolves to Haiku 4.5, which has no effort support, so a `haiku` agent's `effort` key has no effect there). HiveSmith was verified against v2.1.288; its model and effort doctrine was re-checked against v2.1.296.
-- **[uv](https://docs.astral.sh/uv/)** — optional, only for the `uvx` DuckDuckGo MCP fallback
+- **[Claude Code CLI](https://code.claude.com/docs/en/quickstart)** — installed and authenticated (`claude` command available). Version **2.1.280 or newer** is required for the full doctrine (the `opus` alias resolving to Opus 5.5, the `omitClaudeMd` frontmatter key, `maxEffortLevel`, partial `maxTurns` results, `SubagentStop` hooks, the `experimental.cacheTtl` key, and the project-settings `defaultMode` behaviour the QA gate checks). The `sonnet` alias resolves to Sonnet 5.5 only on **2.1.284 or newer** and on the Anthropic API (older versions and other providers resolve an earlier Sonnet), and the `haiku` alias resolves to Haiku 5.5 only on **2.1.293 or newer** and on the Anthropic API (elsewhere it resolves to Haiku 4.5, which has no effort support, so a `haiku` agent's `effort` key has no effect there). The fail-closed guard (`onFailure: block`) needs **2.1.295 or newer**; on older versions the setting is not available and a guard that cannot start lets the command through. HiveSmith was verified against v2.1.296.
+- **Python 3**, reachable as `python3` on `PATH` — runs the `block-destructive.py` guard hook. Without it, every Bash and PowerShell command is blocked (fail-closed).
+- **[uv](https://docs.astral.sh/uv/)** — optional, only for the `uvx` DuckDuckGo MCP fallback (pinned to a reviewed version in `.mcp.json`)
 
 **2. Clone this repository:**
 
@@ -91,7 +92,7 @@ claude "Build me a Kubernetes monitoring swarm with Prometheus and Grafana integ
 
 That's it. HiveSmith will research the domain, architect the agent hierarchy, write every prompt and config file, validate the output, and deliver a working swarm into your target directory.
 
-> **Model configuration is automatic.** The default model is set in `.claude/settings.json`, and each sub-agent's `model:` frontmatter uses Claude aliases (`fable`, `opus`, `sonnet`, `haiku`) that automatically resolve to the latest available versions (currently Fable 5.1, Opus 5.5, Sonnet 5.5, Haiku 5.5 on the Anthropic API; other providers may resolve earlier versions). You don't need to edit model names manually. Doctrine last verified against Claude Code **v2.1.288** (2026-10-03); model aliases, effort levels and subagent frontmatter re-verified against **v2.1.296** (2026-10-12).
+> **Model configuration is automatic.** The default model is set in `.claude/settings.json`, and each sub-agent's `model:` frontmatter uses Claude aliases (`fable`, `opus`, `sonnet`, `haiku`) that automatically resolve to the latest available versions (currently Fable 5.1, Opus 5.5, Sonnet 5.5, Haiku 5.5 on the Anthropic API; other providers may resolve earlier versions). You don't need to edit model names manually. Doctrine last verified against Claude Code **v2.1.296** and its changelog (2026-10-12).
 
 > **Optional check after hand edits.** On Claude Code 2.1.283 or newer, `/doctor prompt-audit` audits `CLAUDE.md`, agents, skills and commands for prompt patterns written for older models — useful after you customise HiveSmith or a generated swarm.
 
@@ -146,9 +147,9 @@ Generated swarms follow the same layout: a plain-markdown `CLAUDE.md` orchestrat
 All agents (both HiveSmith's own and any it generates) operate under 9 global rules:
 
 1. **Web Search Mandatory** — No hallucinated packages, versions, or configs
-2. **Destructive Action Barrier** — No `rm -rf`, `DROP TABLE`, or cloud deletions without human approval; enforced by a deterministic `PreToolUse` guard hook, not just prose
+2. **Destructive Action Barrier** — No `rm -rf`, `DROP TABLE`, or cloud deletions without human approval; enforced by a fail-closed `PreToolUse` guard hook and permission rules, with scoped credentials and the sandbox as the real bound
 3. **Agent-as-Code Standard** — The canonical Claude Code schema: file formats, frontmatter keys, context inheritance, hooks doctrine, coordination mechanisms (hub-and-spoke by allowlist, agent teams, dynamic workflows), model routing and the generated-swarm tier budget — single source of truth for the whole workspace
-4. **Prompt Injection Shield** — All external inputs treated as untrusted
+4. **Prompt Injection Shield** — All external inputs treated as untrusted; no generated agent combines untrusted input, private data and an outbound or state-changing tool (the Rule of Two); memory never stores unverified instructions
 5. **Idempotency & State Safety** — Operations must be safe to re-run
 6. **Human-in-the-Loop** — Agents pause and ask when facing critical ambiguity
 7. **Conflict Resolution** — Orchestrator resolves inter-agent disagreements; safety wins by default
