@@ -10,7 +10,7 @@ To ensure perfect interoperability, the `domain-architect` MUST always output th
   "domain": "string",
   "single_agent_justification": "string (REQUIRED — for a multi-agent roster: why one well-tooled agent cannot do this job, naming for EACH agent in the roster which ground it stands on: context pollution, true parallelism, or specialization threshold; for a single-agent design, where `agents` is an empty array and the CLAUDE.md orchestrator works alone: why one agent suffices; multi-agent implementations typically use 3-10x the tokens of a single agent on the same task, and ~15x the tokens of a chat interaction, so the burden of proof is on decomposition — see Rule 09 §1)",
   "default_model": "string (REQUIRED — 'fable'|'opus'|'sonnet'|'haiku'; written verbatim to the generated .claude/settings.json `model` key; the orchestrator CLAUDE.md runs on it; 'opus' unless the Rule 03 §7 budget justifies otherwise)",
-  "default_effort": "string (OPTIONAL — 'low'|'medium'|'high'|'xhigh'; written to the generated .claude/settings.json `effortLevel` key, which applies to every model in the swarm; omit to run each model at its official default ('medium' on Opus 5.5 and Sonnet 5.5, 'high' on Fable; Haiku 4.5 has no effort); 'high'/'xhigh' require a stated reason inside `single_agent_justification`; 'max' is FORBIDDEN)",
+  "default_effort": "string (OPTIONAL — 'low'|'medium'|'high'|'xhigh'; written to the generated .claude/settings.json `effortLevel` key, which applies to every model in the swarm; omit to run each model at its official default ('medium' on Opus 5.5, Sonnet 5.5 and Haiku 5.5, 'high' on Fable; inert where `haiku` resolves to Haiku 4.5, which has no effort support — Rule 03 §7); 'high'/'xhigh' require a stated reason inside `single_agent_justification`; 'max' is FORBIDDEN)",
   "agents": [
     {
       "id": "string",
@@ -20,7 +20,7 @@ To ensure perfect interoperability, the `domain-architect` MUST always output th
       "tools_required": ["string"],
       "tools_justification": "string (REQUIRED when tools_required includes 'Agent', 'Agent(<type>)' or 'SendMessage', or is intentionally empty to inherit all tools — names the peer/delegation relationship and its purpose per Rule 03 §5)",
       "dependencies": ["string"],
-      "effort": "string ('low'|'medium'|'high'|'xhigh'; REQUIRED and 'high' for non-haiku verification/QA/reviewer and research roles per Rule 03 §7, otherwise OPTIONAL — omitted, the agent runs at the session level, 'medium' on Opus 5.5 and Sonnet 5.5, 'high' on Fable; omit for 'haiku' (no effort support); 'max' is FORBIDDEN in generated swarms; 'xhigh' requires a measured-gain justification in the role string)",
+      "effort": "string ('low'|'medium'|'high'|'xhigh'; REQUIRED and 'high' for verification/QA/reviewer and research roles on every tier, 'haiku' included, per Rule 03 §7; RECOMMENDED 'low' for mechanical, high-volume 'haiku' roles; otherwise OPTIONAL — omitted, the agent runs at the session level, 'medium' on Opus 5.5, Sonnet 5.5 and Haiku 5.5, 'high' on Fable; inert where 'haiku' resolves to Haiku 4.5; 'max' is FORBIDDEN in generated swarms; 'xhigh' requires a measured-gain justification in the role string)",
       "isolation": "string (OPTIONAL — 'worktree'; only for agents writing files inside the same git repo in parallel with other writers)",
       "maxTurns": "number (OPTIONAL — runaway cap for loop-prone workers)",
       "memory": "string (OPTIONAL — 'user'|'project'|'local'; only for agents whose judgment improves across runs)"
