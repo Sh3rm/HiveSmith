@@ -2,6 +2,8 @@
 
 **You describe the swarm. HiveSmith forges it.**
 
+> **Archived on 2026-11-10.** HiveSmith is complete and no longer maintained. v1.3.0 is the final release, verified against Claude Code v2.1.296; later Claude Code and model releases are not tracked, so check the generated files against the current documentation before relying on them. Much of what HiveSmith automated can now be done with Claude Code's built-in sub-agents and dynamic workflows. The code stays available under the Apache 2.0 license.
+
 [![License](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](LICENSE)
 [![Powered by](https://img.shields.io/badge/Powered_by-Claude_Code-8b5cf6.svg)](https://code.claude.com/docs)
 [![Verified against](https://img.shields.io/badge/Claude_Code-v2.1.296-22c55e.svg)](https://github.com/anthropics/claude-code/blob/main/CHANGELOG.md)
